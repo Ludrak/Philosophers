@@ -27,12 +27,13 @@ typedef struct  s_table_rules
 
 typedef struct  s_table
 {
-    uint8_t         running;
+    //uint8_t         running;
     uint64_t        start_time;
     uint64_t        n_philo;
     t_philo         *philos;
     sem_t           *speak_lock;
     sem_t           *forks;
+    sem_t           *running;
     
     t_table_rules   rules;
 }               t_table;

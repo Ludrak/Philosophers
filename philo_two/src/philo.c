@@ -7,12 +7,12 @@ static void *philo_routine(void *const arg)
     t_philo *self;
 
     self = (t_philo *)arg;
-    while (g_table->running)
+    while (1)
     {
         if (philo_take_forks(self) == EXIT_FAILURE)
             continue ;
-        if (philo_eat(self) == EXIT_FAILURE || philo_sleep(self) == EXIT_FAILURE
-            || (self->eat_times >= g_table->rules.max_eat_time && g_table->rules.has_max_eat))
+        if (philo_eat(self) == EXIT_FAILURE || philo_sleep(self) == EXIT_FAILURE)
+           // || (self->eat_times >= g_table->rules.max_eat_time && g_table->rules.has_max_eat))
             return (NULL);
     }
     return (arg);
@@ -25,15 +25,15 @@ static void *death_observer_routine(void *const arg)
     t_philo *self;
 
     self = (t_philo *)arg;
-    while (g_table->running)
+    while (1)
     {
         if (sem_wait(self->lock) != 0)
             return (NULL);
-        if (get_time_since(self->last_eat_time) >= g_table->rules.die_time)
+        if ((get_time_since(self->last_eat_time) >= g_table->rules.die_time)
+        || (self->eat_times >= g_table->rules.max_eat_time && g_table->rules.has_max_eat))
         {
             philo_talk(self, A_DIE, 0);
-            g_table->running = 0;
-            sem_post(self->lock);
+            sem_post(g_table->running);
             return (NULL);
         }
         if (sem_post(self->lock) != 0)
