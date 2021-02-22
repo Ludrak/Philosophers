@@ -24,6 +24,6 @@ int main(int ac, char **av)
     }
     else
         rules.max_eat_time = 0;
-    printf ("Rules for %llu philosophers :\n- die_time: %d\n- eat_time: %d\n- sleep_time: %d\n- time_philo_eat: %d\n\n", ft_atoi(av[1]), rules.eat_time, rules.die_time, rules.sleep_time, rules.max_eat_time);
+    printf ("Rules for %llu philosophers :\n- die_time: %d\n- eat_time: %d\n- sleep_time: %d\n- time_philo_eat: %d\n\n", ft_atoi(av[1]), rules.die_time, rules.eat_time, rules.sleep_time, rules.max_eat_time);
     return (init_table(rules, ft_atoi(av[1])));
 }

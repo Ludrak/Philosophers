@@ -6,6 +6,8 @@
 # include <stdlib.h>
 # include <pthread.h>
 # include <stdio.h>
+# include <fcntl.h>
+# include <semaphore.h>
 
 # include "philo_time.h"
 
@@ -25,8 +27,7 @@ typedef struct  s_philo
     uint64_t        eat_times;
     pthread_t       thread;
     pthread_t       death_observer;
-    pthread_mutex_t *forks[2];
-    pthread_mutex_t *lock;
+    sem_t           *lock;
 }               t_philo;
 
 uint8_t     create_philo(t_philo *philo);
@@ -35,7 +36,7 @@ uint8_t     create_philo(t_philo *philo);
 **  Actions
 */
 
-uint64_t    philo_talk(t_philo *const philo, int action_id);
+uint64_t    philo_talk(t_philo *const philo, const uint8_t action_id, const uint8_t unlock_speak);
 uint8_t     philo_take_forks(t_philo *const philo);
 uint8_t     philo_eat(t_philo *const philo);
 uint8_t     philo_sleep(t_philo *const philo);

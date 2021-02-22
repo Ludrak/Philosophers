@@ -5,10 +5,16 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <stdint.h>
+# include <sys/stat.h>
 # include <pthread.h>
+# include <fcntl.h>
+# include <semaphore.h>
 
 # include "philo.h"
 # include "utils.h"
+
+# define SEM_OFLAGS			O_CREAT | O_EXCL
+# define SEM_PERMS			420
 
 typedef struct  s_table_rules
 {
@@ -25,8 +31,9 @@ typedef struct  s_table
     uint64_t        start_time;
     uint64_t        n_philo;
     t_philo         *philos;
-    pthread_mutex_t speak_lock;
-    pthread_mutex_t *forks;
+    sem_t           *speak_lock;
+    sem_t           *forks;
+    
     t_table_rules   rules;
 }               t_table;
 
