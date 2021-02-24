@@ -12,7 +12,7 @@ uint64_t    philo_talk(t_philo *const philo, const uint8_t action_id, const uint
         "died"
     };
 
-    if (sem_wait(g_table->speak_lock) != 0)
+    if (sem_wait(g_table->speak_lock) != 0 || get_semlock_value(g_table->run_lock, &g_table->running) == 0)
         return (EXIT_FAILURE);
     time = get_time();
 	if (time < 0)
@@ -28,9 +28,9 @@ uint64_t    philo_talk(t_philo *const philo, const uint8_t action_id, const uint
 
 uint8_t     philo_take_forks(t_philo *const philo)
 {
-    if (sem_wait(g_table->forks) != 0 || philo_talk(philo, A_FORK, 1) == EXIT_FAILURE)
+    if (sem_wait(g_table->forks_counter) != 0 || philo_talk(philo, A_FORK, 1) == EXIT_FAILURE)
         return (EXIT_FAILURE);
-    if (sem_wait(g_table->forks) != 0 || philo_talk(philo, A_FORK, 1) == EXIT_FAILURE)
+    if (sem_wait(g_table->forks_counter) != 0 || philo_talk(philo, A_FORK, 1) == EXIT_FAILURE)
         return (EXIT_FAILURE);
     return (EXIT_SUCCESS);
 }
@@ -47,7 +47,7 @@ uint8_t     philo_eat(t_philo *const philo)
     if (sem_post(philo->lock) != 0)
         return (EXIT_FAILURE);
     sleep_until(philo->last_eat_time + g_table->rules.eat_time);
-    if (sem_post(g_table->forks) != 0 || sem_post(g_table->forks) != 0)
+    if (sem_post(g_table->forks_counter) != 0 || sem_post(g_table->forks_counter) != 0)
         return (EXIT_FAILURE);
     return (EXIT_SUCCESS);
 }

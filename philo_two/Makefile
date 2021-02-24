@@ -7,7 +7,8 @@ SRCS=	main.c \
 		table.c \
 		utils.c \
 		philo.c \
-		philo_actions.c
+		philo_actions.c \
+		sem_utils.c
 
 OBJDIR=bin
 OBJS=$(SRCS:%.c=$(OBJDIR)/%.o)

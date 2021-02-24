@@ -12,7 +12,6 @@ static void *philo_routine(void *const arg)
         if (philo_take_forks(self) == EXIT_FAILURE)
             continue ;
         if (philo_eat(self) == EXIT_FAILURE || philo_sleep(self) == EXIT_FAILURE)
-           // || (self->eat_times >= g_table->rules.max_eat_time && g_table->rules.has_max_eat))
             return (NULL);
     }
     return (arg);
@@ -22,19 +21,28 @@ static void *philo_routine(void *const arg)
 
 static void *death_observer_routine(void *const arg)
 {
-    t_philo *self;
+    t_philo  *self;
+    uint8_t  satisfied;
+    uint64_t n_philo;
 
     self = (t_philo *)arg;
+    satisfied = 0;
     while (1)
     {
         if (sem_wait(self->lock) != 0)
             return (NULL);
-        if ((get_time_since(self->last_eat_time) >= g_table->rules.die_time)
-        || (self->eat_times >= g_table->rules.max_eat_time && g_table->rules.has_max_eat))
+        if (get_time_since(self->last_eat_time) >= g_table->rules.die_time)
         {
             philo_talk(self, A_DIE, 0);
-            sem_post(g_table->running);
+            n_philo = g_table->n_philo;
+            while (n_philo-- >= 0)
+                sem_post(g_table->satisfied_event);
             return (NULL);
+        }
+        if (!satisfied && g_table->rules.has_max_eat && self->eat_times == g_table->rules.max_eat)
+        {
+            sem_post(g_table->satisfied_event);
+            satisfied = 1;
         }
         if (sem_post(self->lock) != 0)
             return (NULL);
