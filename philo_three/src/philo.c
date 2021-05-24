@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: lrobino <lrobino@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/05/24 08:50:18 by lrobino           #+#    #+#             */
-/*   Updated: 2021/05/24 08:51:49 by lrobino          ###   ########.fr       */
+/*   Created: 2021/05/24 09:18:01 by lrobino           #+#    #+#             */
+/*   Updated: 2021/05/24 09:20:32 by lrobino          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,15 +51,31 @@ static void	*death_observer_routine(void *const arg)
 				sem_post(g_table->satisfied_event);
 			return (NULL);
 		}
-		if (!self->satisfied && g_table->rules.has_max_eat
+		else if (!self->satisfied && g_table->rules.has_max_eat
 			&& self->eat_times == g_table->rules.max_eat)
 		{
-			self->satisfied = 1;
 			sem_post(g_table->satisfied_event);
+			self->satisfied = 1;
 		}
 		sem_post(self->lock);
 	}
 	return (arg);
+}
+
+static void	philo_process(t_philo *const philo)
+{
+	philo->pid = fork();
+	if (philo->pid == 0)
+	{
+		if ((pthread_create(&philo->death_observer, NULL,
+					death_observer_routine, philo)) != 0)
+			exit (EXIT_FAILURE);
+		if ((pthread_detach(philo->death_observer)) != 0)
+			exit (EXIT_FAILURE);
+		while (g_table->running)
+			philo_routine(philo);
+		exit (EXIT_SUCCESS);
+	}
 }
 
 uint8_t	create_philo(t_philo *const philo)
@@ -68,25 +84,17 @@ uint8_t	create_philo(t_philo *const philo)
 	char			*lock_sem;
 
 	philo_id++;
-	lock_sem = ft_strjoin("philo_lock_", ft_uitoa(philo_id));
 	philo->id = philo_id;
 	philo->eat_times = 0;
 	philo->birth_time = get_time();
 	philo->last_eat_time = philo->birth_time;
 	philo->satisfied = 0;
+	lock_sem = ft_strjoin("philo_lock_", ft_uitoa(philo_id));
 	sem_unlink(lock_sem);
 	philo->lock = sem_open(lock_sem, SEM_OFLAGS, SEM_PERMS, 1);
 	if (philo->lock == SEM_FAILED)
 		return (EXIT_FAILURE);
 	free(lock_sem);
-	if ((pthread_create(&philo->thread, NULL, philo_routine, philo)) != 0)
-		return (EXIT_FAILURE);
-	if ((pthread_detach(philo->thread)) != 0)
-		return (EXIT_FAILURE);
-	if ((pthread_create(&philo->death_observer, NULL,
-				death_observer_routine, philo)) != 0)
-		return (EXIT_FAILURE);
-	if ((pthread_detach(philo->death_observer)) != 0)
-		return (EXIT_FAILURE);
+	philo_process(philo);
 	return (EXIT_SUCCESS);
 }

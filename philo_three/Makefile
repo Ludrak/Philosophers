@@ -1,5 +1,5 @@
 
-NAME=philo_two
+NAME=philo_three
 
 SRC_DIR=src
 SRCS=	main.c \
@@ -15,7 +15,7 @@ OBJDIR=bin
 OBJS=$(SRCS:%.c=$(OBJDIR)/%.o)
 
 CLANG=clang
-CFLAGS=-Wextra -Wall -pthread
+CFLAGS=-Wextra -Wall -pthread #-g3 -fsanitize=address
 IFLAGS=-Iinc
 
 all: $(NAME)

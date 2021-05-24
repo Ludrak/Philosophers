@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: lrobino <lrobino@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/05/24 08:53:12 by lrobino           #+#    #+#             */
-/*   Updated: 2021/05/24 08:59:46 by lrobino          ###   ########.fr       */
+/*   Created: 2021/05/24 09:22:36 by lrobino           #+#    #+#             */
+/*   Updated: 2021/05/24 09:27:13 by lrobino          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,9 @@ int	clear_table(const uint64_t n_philo)
 	uint64_t	i;
 	char		*lock_sem;
 
+	i = 0;
+	while (i < g_table->n_philo)
+		kill(g_table->philos[i++].pid, SIGKILL);
 	set_semlock_value(g_table->run_lock, &g_table->running, 0);
 	i = -1;
 	while (++i < n_philo)
@@ -49,19 +52,23 @@ int	clear_table(const uint64_t n_philo)
 		destroy_sem(lock_sem, g_table->philos[i].lock, 0);
 		free(lock_sem);
 	}
+	destroy_sem("speak_lock", g_table->speak_lock, 0);
+	destroy_sem("forks_counter", g_table->forks_counter, 0);
+	destroy_sem("run_lock", g_table->run_lock, 0);
 	free(g_table->philos);
 	free(g_table);
 	return (EXIT_SUCCESS);
 }
 
-int	check_table_rules(const t_table_rules rules)
+int	check_table_rules(const t_table_rules rules, const int n_philo)
 {
-	if (rules.die_time < 1 || rules.eat_time < 1 || rules.sleep_time < 1
-		|| (rules.has_max_eat && rules.eat_time < 1))
+	if (rules.die_time < 1 || rules.eat_time <= 1 || rules.sleep_time <= 1)
 	{
-		printf ("Error: null or negatives values are not allowed.\n");
+		printf ("Error: Cannot use null values as parameters.\n");
 		return (EXIT_FAILURE);
 	}
+	if (n_philo < 1)
+		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }
 
@@ -69,12 +76,11 @@ int	init_table(const t_table_rules rules, const uint64_t n_philo)
 {
 	uint64_t	i;
 
-	if (check_table_rules(rules)
-		|| !nmalloc((void **)&g_table, 1, sizeof(t_table)))
+	if (check_table_rules(rules, n_philo)
+		|| !(nmalloc((void **)&g_table, 1, sizeof(t_table))))
 		return (EXIT_FAILURE);
 	g_table->rules = rules;
-	if (n_philo > 1
-		&& !nmalloc((void **)&g_table->philos, n_philo, sizeof(t_philo)))
+	if (!(nmalloc((void **)&g_table->philos, n_philo, sizeof(t_philo))))
 		return (EXIT_FAILURE);
 	init_sem(n_philo);
 	g_table->n_philo = n_philo;

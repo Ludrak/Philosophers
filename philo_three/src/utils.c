@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: lrobino <lrobino@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/05/24 09:01:36 by lrobino           #+#    #+#             */
-/*   Updated: 2021/05/24 09:05:24 by lrobino          ###   ########.fr       */
+/*   Created: 2021/05/24 09:29:32 by lrobino           #+#    #+#             */
+/*   Updated: 2021/05/24 09:32:10 by lrobino          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,20 +22,20 @@ uint64_t	ft_atoui(const char *s)
 		return (0);
 	while (s && *s >= '0' && *s <= '9' && n < UINT32_MAX)
 		n = (n * 10) + (*s++ - '0');
-	if (n >= UINT32_MAX)
+	if (n > UINT32_MAX)
 		return (UINT32_MAX);
 	return (n);
 }
 
 static uint64_t	count(uint64_t n)
 {
-	uint64_t		i;
+	uint64_t	i;
 
 	i = 1;
 	while (n)
 	{
-		n /= 10;
 		i++;
+		n /= 10;
 	}
 	return (i);
 }

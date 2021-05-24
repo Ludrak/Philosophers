@@ -13,7 +13,7 @@ OBJDIR=bin
 OBJS=$(SRCS:%.c=$(OBJDIR)/%.o)
 
 CLANG=clang
-CFLAGS=-Wextra -Wall -Werror -pthread -g3 -fsanitize=address
+CFLAGS=-Wextra -Wall -Werror -pthread
 IFLAGS=-Iinc
 
 all: $(NAME)

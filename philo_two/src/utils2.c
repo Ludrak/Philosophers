@@ -1,34 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.h                                            :+:      :+:    :+:   */
+/*   utils2.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lrobino <lrobino@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/05/24 09:14:00 by lrobino           #+#    #+#             */
-/*   Updated: 2021/05/24 09:14:15 by lrobino          ###   ########.fr       */
+/*   Created: 2021/05/24 08:09:27 by lrobino           #+#    #+#             */
+/*   Updated: 2021/05/24 09:05:53 by lrobino          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef UTILS_H
-# define UTILS_H
+#include "utils.h"
 
-# include <stdint.h>
-# include <stdlib.h>
+uint8_t	ft_isnum(char *s)
+{
+	if (s && *s == '-')
+		s++;
+	while (s && *s >= '0' && *s <= '9')
+		s++;
+	if (*s)
+		return (0);
+	return (1);
+}
 
-/*
-**  Conversion
-*/
-uint64_t	ft_atoui(const char *s);
-char		*ft_uitoa(uint64_t n);
-
-/*
-**  Strings
-*/
-size_t		ft_strlen(const char *const s);
-char		*ft_strjoin(const char *s1, char *s2);
-uint8_t		ft_isnum(char *s);
-
-void		*nmalloc(void **ptr, size_t size, size_t block);
-
-#endif
+void	*nmalloc(void **ptr, size_t size, size_t block)
+{
+	*ptr = malloc(size * block);
+	return (*ptr);
+}
